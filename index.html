@@ -1,23 +1,27 @@
 <!DOCTYPE html>
 <html>
-
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>title</title>
-    <link rel="stylesheet" href="normalize.css" type="text/css">
-    <link rel="stylesheet" href="main.css" type="text/css">
-    <script src="p2pt.umd.min.js"></script>
-    <script src="pixi.min.js"></script>
+    <title>Battleship Missile Command</title>
+
+    <link rel="stylesheet" href="css/normalize.css" type="text/css">
+    <link rel="stylesheet" href="css/main.css" type="text/css">
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/pixi.min.js"></script>
+    <script src="js/victor.min.js"></script>
 </head>
 
 <body>
-    <div id="log"></div>
-
-
-    <script src="peer2peer.js"></script>
-    <script src="victor.min.js"></script>
-    <script src="main.js"></script>
+    <script src="js/variables.js"></script>
+    <script src="js/client.js"></script>
+    <script src="js/setup.js"></script>
+    <script src="js/rendering.js"></script>
+    <script src="js/grid.js"></script>
+    <script src="js/boom.js"></script>
+    <script src="js/loop.js"></script>
 </body>
 
 </html>
