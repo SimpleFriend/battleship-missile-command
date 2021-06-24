@@ -1,0 +1,28 @@
+{
+  "name": "battleship-missile-command",
+  "version": "1.0.0",
+  "description": "Simple 2 players game inspired from Battleship and Missile Command",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimpleFriend/battleship-missile-command.git"
+  },
+  "keywords": [
+    "Multiplayer",
+    "game",
+    "Node.js",
+    "socket.io",
+    "Battleship",
+    "Missile Command"
+  ],
+  "author": "Zero",
+  "homepage": "https://github.com/SimpleFriend/battleship-missile-command",
+  "dependencies": {
+    "express": "^4.15.2",
+    "socket.io": "^1.7.3"
+  }
+}
