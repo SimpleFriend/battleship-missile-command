@@ -1,0 +1,7 @@
+html, body { background: black; }
+
+#who {
+    font-size: 80%;
+    font-style: italic;
+    color: navy;
+}

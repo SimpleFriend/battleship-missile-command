@@ -25,13 +25,28 @@ document.body.appendChild(app.view);
 var particles = {};
 
 particles.missileContainer = {
-    true: new PIXI.ParticleContainer(100, {
+    true: new PIXI.ParticleContainer(50, {
         scale: true,
         position: true,
         rotation: true,
         alpha: true,
     }),
-    false: new PIXI.ParticleContainer(100, {
+    false: new PIXI.ParticleContainer(50, {
+        scale: true,
+        position: true,
+        rotation: true,
+        alpha: true,
+    })
+};
+
+particles.tubeContainer = {
+    true: new PIXI.ParticleContainer(50, {
+        scale: true,
+        position: true,
+        rotation: true,
+        alpha: true,
+    }),
+    false: new PIXI.ParticleContainer(50, {
         scale: true,
         position: true,
         rotation: true,
@@ -40,13 +55,13 @@ particles.missileContainer = {
 };
 
 particles.trailContainer = {
-    true: new PIXI.ParticleContainer(100, {
+    true: new PIXI.ParticleContainer(50, {
         scale: true,
         position: true,
         rotation: true,
         alpha: true,
     }),
-    false: new PIXI.ParticleContainer(100, {
+    false: new PIXI.ParticleContainer(50, {
         scale: true,
         position: true,
         rotation: true,
@@ -55,13 +70,13 @@ particles.trailContainer = {
 };
 
 particles.mainboomContainer = {
-    true: new PIXI.ParticleContainer(100, {
+    true: new PIXI.ParticleContainer(50, {
         scale: true,
         position: true,
         rotation: true,
         alpha: true,
     }),
-    false: new PIXI.ParticleContainer(100, {
+    false: new PIXI.ParticleContainer(50, {
         scale: true,
         position: true,
         rotation: true,
@@ -69,7 +84,7 @@ particles.mainboomContainer = {
     })
 };
 
-particles.lineboomContainer = new PIXI.ParticleContainer(100, {
+particles.lineboomContainer = new PIXI.ParticleContainer(50, {
     scale: true,
     position: true,
     rotation: true,
@@ -77,13 +92,13 @@ particles.lineboomContainer = new PIXI.ParticleContainer(100, {
 });
 
 particles.crosshairContainer = {
-    true: new PIXI.ParticleContainer(100, {
+    true: new PIXI.ParticleContainer(50, {
         scale: true,
         position: true,
         rotation: true,
         alpha: true,
     }),
-    false: new PIXI.ParticleContainer(100, {
+    false: new PIXI.ParticleContainer(50, {
         scale: true,
         position: true,
         rotation: true,
@@ -105,6 +120,13 @@ particles.dotContainer = {
         alpha: true,
     })
 };
+
+particles.burnContainer = new PIXI.ParticleContainer(36, {
+    scale: true,
+    position: true,
+    rotation: true,
+    alpha: true,
+});
 
 
 
@@ -166,23 +188,44 @@ PIXI.loader
 
 
 
+// text style
+
+window.textStyle = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    dropShadow: true,
+    dropShadowBlur: 4,
+    dropShadowColor: "#4000ff",
+    dropShadowDistance: 0,
+    fill: "white",
+    fontSize: 20,
+    align: "center"
+});
+
+
+
 // sprites scales
 
-function scaleSea(heightPercent) {
+function scaleStuff() {
 
-    seaScale = 1 / 100 * app.renderer.view.height * heightPercent / 8;
-    boatScale = seaScale;
+    window.gridScale = 0.4;
+    window.bgScale = app.renderer.view.width / 1920;
+    window.boatScale = gridScale * bgScale;
+    window.missileScale = boatScale * 0.5;
+    window.dotSqrDiameter = Math.sqr(seaPos(1, 0).x - seaPos(0, 0).x) * 2;
 }
 
 
 
 // grid to screen coordinates
 
-function seaPos(x, y) {
+function seaPos(ix, iy) {
+
+    let x = Math.round(ix * 2) / 2;
+    let y = Math.round(iy * 2) / 2;
 
     return {
-        x: (x + 3) * 100 * seaScale,
-        y: app.renderer.view.height / 2 + (y - (gridH - 1) / 2) * 100 * seaScale
+        x: -95 + (x + 2) * gridScale / 1920 * 200 * 100,
+        y: (y - 8) * gridScale / 1920 * 200 * 100
     };
 }
 
@@ -198,7 +241,7 @@ function buildGrid(blue) {
 
         for (let y = 0; y < gridH; ++y) for (let x = 0; x < gridW; ++x) {
 
-            let pos = seaPos(x, y);
+            let pos = posGameToScreen(seaPos(x, y - 0.5));
 
             let skip = false;
             for (let boat of boatSprites[blue])
@@ -211,12 +254,15 @@ function buildGrid(blue) {
             let dot = new PIXI.Sprite(
                 PIXI.loader.resources["assets/b-dot.png"].texture
             );
-            dot.scale.x = seaScale;
-            dot.scale.y = seaScale;
+            dot.scale.x = boatScale;
+            dot.scale.y = boatScale;
             dot.anchor.x = 0.5;
             dot.anchor.y = 0.5;
+            dot.alpha = 0.5;
 
             Object.assign(dot, pos);
+
+            dots['b-x'+x+'y'+y] = dot;
 
             particles.dotContainer[true].addChild(dot);
         }
@@ -228,14 +274,17 @@ function buildGrid(blue) {
             let dot = new PIXI.Sprite(
                 PIXI.loader.resources["assets/r-dot.png"].texture
             );
-            dot.scale.x = seaScale;
-            dot.scale.y = seaScale;
+            dot.scale.x = boatScale;
+            dot.scale.y = boatScale;
             dot.anchor.x = 0.5;
             dot.anchor.y = 0.5;
+            dot.alpha = 0.5;
 
-            let pos = seaPos(x, y);
+            let pos = posGameToScreen(seaPos(x, y - 0.5));
             dot.x = app.renderer.view.width - pos.x;
             dot.y = pos.y;
+
+            dots['r-x'+x+'y'+y] = dot;
 
             particles.dotContainer[false].addChild(dot);
         }
@@ -246,105 +295,90 @@ function buildGrid(blue) {
 
 // draw boats on screen
 
-function displayBoats(pos) {
+function displayBoats(pos, red) {
 
     boatSprites[true] = [];
 
+    for (let ship of Object.keys(pos)) {
 
+        boat = new PIXI.Sprite(
+            PIXI.loader.resources[`assets/${red?'r':'b'}-${ship}.png`].texture
+        );
 
-    boat = new PIXI.Sprite(
-        PIXI.loader.resources["assets/b-carrier.png"].texture
-    );
+        boat.blendMode = PIXI.BLEND_MODES.ADD;
+        boat.scale.x = boatScale * (pos[ship].d < 2 && ship == "carrier" ? -1 : 1) * (red ? -1 : 1);
+        boat.scale.y = boatScale * (red && ship == "submarine" && (pos[ship].d == 1 || pos[ship].d == 3 ) ? -1 : 1);
+        boat.anchor.x = 0.5;
+        boat.anchor.y = 0.5;
 
-    boat.blendMode = PIXI.BLEND_MODES.ADD;
-    boat.scale.x = boatScale * (pos.carrier.d < 2 ? -1 : 1);
-    boat.scale.y = boatScale;
-    boat.anchor.x = 0.5;
-    boat.anchor.y = 0.5;
+        boat.rotation = Math.PI / 2 * pos[ship].d;
 
-    boat.rotation = Math.PI / 2 * pos.carrier.d;
+        let offset = ship == "carrier" ? 0.5 : 0;
+        let bpos = posGameToScreen(seaPos(offset + pos[ship].x, offset + pos[ship].y - 0.5));
 
-    let bpos = seaPos(0.5 + pos.carrier.x, 0.5 + pos.carrier.y);
+        if (red) bpos.x = app.renderer.view.width - bpos.x;
 
-    boat.parts = pos.carrier.parts;
+        boat.parts = pos[ship].parts;
 
-    boat.x = bpos.x;
-    boat.y = bpos.y;
+        Object.assign(boat, bpos);
 
-    app.stage.addChild(boat);
-    boatSprites[true].push(boat);
+        app.stage.addChild(boat);
+        boatSprites[true].push(boat);
 
-
-
-    boat = new PIXI.Sprite(
-        PIXI.loader.resources["assets/b-submarine.png"].texture
-    );
-
-    boat.blendMode = PIXI.BLEND_MODES.ADD;
-    boat.scale.x = boatScale * (pos.submarine.d < 2 ? -1 : 1);
-    boat.scale.y = boatScale;
-    boat.anchor.x = 0.5;
-    boat.anchor.y = 0.5;
-
-    boat.rotation = Math.PI / 2 * pos.submarine.d;
-
-    bpos = seaPos(pos.submarine.x, pos.submarine.y);
-
-    boat.parts = pos.submarine.parts;
-
-    boat.x = bpos.x;
-    boat.y = bpos.y;
-
-    app.stage.addChild(boat);
-    boatSprites[true].push(boat);
-
-
-
-    boat = new PIXI.Sprite(
-        PIXI.loader.resources["assets/b-destroyer.png"].texture
-    );
-
-    boat.blendMode = PIXI.BLEND_MODES.ADD;
-    boat.scale.x = boatScale * (pos.destroyer.d < 2 ? -1 : 1);
-    boat.scale.y = boatScale;
-    boat.anchor.x = 0.5;
-    boat.anchor.y = 0.5;
-
-    boat.rotation = Math.PI / 2 * pos.destroyer.d;
-
-    bpos = seaPos(pos.destroyer.x, pos.destroyer.y);
-
-    boat.parts = pos.destroyer.parts;
-
-    boat.x = bpos.x;
-    boat.y = bpos.y;
-
-    app.stage.addChild(boat);
-    boatSprites[true].push(boat);
-
-
-
-    boat = new PIXI.Sprite(
-        PIXI.loader.resources["assets/b-battleship.png"].texture
-    );
-
-    boat.blendMode = PIXI.BLEND_MODES.ADD;
-    boat.scale.x = boatScale * (pos.battleship.d < 2 ? -1 : 1);
-    boat.scale.y = boatScale;
-    boat.anchor.x = 0.5;
-    boat.anchor.y = 0.5;
-
-    boat.rotation = Math.PI / 2 * pos.battleship.d;
-
-    bpos = seaPos(pos.battleship.x, pos.battleship.y);
-
-    boat.parts = pos.battleship.parts;
-
-    boat.x = bpos.x;
-    boat.y = bpos.y;
-
-    app.stage.addChild(boat);
-    boatSprites[true].push(boat);
+    }
 }
 
 
+
+function writeText(what, x, y) {
+    
+    let text = new PIXI.Text(what, window.textStyle);
+
+    let pos = posGameToScreen({
+        x: x,
+        y: y
+    });
+    pos.y = Math.min(Math.max(20, pos.y), app.renderer.view.height - 20);
+    text.anchor.x = 0.5;
+    text.anchor.y = 0.5;
+    Object.assign(text, pos);
+    app.stage.addChild(text);        
+}
+
+
+function buildLaunchers(blue, launchers, name) {
+
+    writeText(simplifyName(name), blue ? -50 : 50, -50);
+
+    if (!blue) {
+
+        writeText("← vs →", 0, -50);
+        writeText(my.room, 0, 50);
+        
+        ++defeats; localStorage.setItem("BMC_Defeats", defeats);
+    }
+
+    for (let l = 0; l < launchers.length; ++l) {
+
+        let launcher = new PIXI.Sprite(
+            PIXI.loader.resources[`assets/${blue ? 'b' : 'r'}-launcher.png`].texture
+        );
+
+        launcher.scale.x = boatScale;
+        launcher.scale.y = boatScale;
+        launcher.anchor.x = 0.5;
+        launcher.anchor.y = 0.5;
+
+        let pos = posGameToScreen({
+            x: blue ? -95 : 95,
+            y: launchers[l]
+        });
+        Object.assign(launcher, { x: pos.x, y: pos.y });
+
+        launcherPos[blue].push(pos);
+
+        app.stage.addChild(launcher);
+    }
+
+    if (!blue) buildGrid(false);
+}

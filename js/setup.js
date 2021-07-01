@@ -1,9 +1,6 @@
 
 function setup() {
 
-
-    scaleSea(0.333);
-
     bg = new PIXI.Sprite(
         PIXI.loader.resources["assets/" + bgName + ".jpg"].texture
     );
@@ -21,16 +18,19 @@ function setup() {
 
     app.stage.addChild(bg);
 
+    scaleStuff();
 
 
-
+    app.stage.addChild(particles.burnContainer);
 
     app.stage.addChild(particles.trailContainer[false]);
+    app.stage.addChild(particles.tubeContainer[false]);
     app.stage.addChild(particles.missileContainer[false]);
     app.stage.addChild(particles.mainboomContainer[false]);
     app.stage.addChild(particles.crosshairContainer[false]);
 
     app.stage.addChild(particles.trailContainer[true]);
+    app.stage.addChild(particles.tubeContainer[true]);
     app.stage.addChild(particles.missileContainer[true]);
     app.stage.addChild(particles.mainboomContainer[true]);
     app.stage.addChild(particles.crosshairContainer[true]);
@@ -43,65 +43,83 @@ function setup() {
 
 
 
-    for (let l = 0; l < 3; ++l) {
 
-        let launcher = new PIXI.Sprite(
-            PIXI.loader.resources["assets/b-launcher.png"].texture
-        );
-
-        launcher.scale.x = boatScale;
-        launcher.scale.y = boatScale;
-        launcher.anchor.x = 0.5;
-        launcher.anchor.y = 0.5;
-
-        launcher.x = seaPos(-2, 0.5 + l * 8).x;
-        launcher.y = seaPos(0, 0.5 + l * 8).y;
+    //playerName = window.prompt("Player Name", playerName);
+    //roomName = window.prompt("Room Name\n(leave empty to join any room)", roomName) || '';
 
 
-        app.stage.addChild(launcher);
+    let go = () => {
+
+        fleetPos = placeFleet();
+
+        Client.askNewPlayer(playerName, fleetPos, roomName);
+    
+        bg.interactive = true;
+    
+        bg.on("mousedown", function (e) {
+
+            let nuke = checkNuke({ x: e.data.global.x, y: e.data.global.y });
+            let pos = nuke ?
+                posGameToScreen(seaPos(nuke.x, nuke.y - 0.5)) :
+                { x: e.data.global.x, y: e.data.global.y };
+            if (nuke) pos.x = app.renderer.view.width - pos.x;
+            Client.sendClick(
+                posScreenToGame(pos),
+                nuke
+            );
+        });
+    
+        app.ticker.add(delta => mainLoop(delta));
     }
 
 
+    PurePopup.prompt({
+        title: `<img src="assets/bmc-banner.jpg">`,
+        buttons: {
+            specRoom: "Join a specific room",
+            anyRoom: "Join any room",
+        },
+        inputs: {
+            playerName: `<span id="who">Connected Players:</span><br>Please, enter your name`,
+        }
+    }, function(result) {
+        
+        playerName = result.playerName;
+        localStorage.setItem("BMC_PlayerName", playerName);
 
+        if (result.confirm == "specRoom") {
 
+            PurePopup.prompt({
+                title: `<img src="assets/room.jpg">`,
+                buttons: {
+                    cancelButton: 'Cancel',
+                    okButton: 'Continue'
+                },
+                inputs: {
+                    roomName: 'Room',                }
+                },
+                function(result) {
 
-    for (let l = 0; l < 3; ++l) {
+                    if (result.confirm == "okButton") roomName = result.roomName;
+                    go();
+                }
+            );
 
-        let launcher = new PIXI.Sprite(
-            PIXI.loader.resources["assets/r-launcher.png"].texture
-        );
+        } else go();
 
-        launcher.scale.x = boatScale;
-        launcher.scale.y = boatScale;
-        launcher.anchor.x = 0.5;
-        launcher.anchor.y = 0.5;
-
-        launcher.x = app.renderer.view.width - seaPos(-2, 0.5 + l * 8).x;
-        launcher.y = seaPos(0, 0.5 + l * 8).y;
-
-
-        app.stage.addChild(launcher);
-    }
-
-
-
-    playerName = window.prompt("Player Name", playerName);
-
-    fleetPos = placeFleet();
-
-    buildGrid(false);
-
-    Client.askNewPlayer(playerName, fleetPos);
-
-
-
-    bg.interactive = true;
-
-    bg.on("mousedown", function (e) {
-
-        Client.sendClick(e.data.global.x, e.data.global.y);
     });
 
+    setTimeout(() => {
+        document.getElementById("purePopupInputs_playerName").value = playerName;
+        Client.who();
+    }, 250);
 
-    app.ticker.add(delta => mainLoop(delta));
+}
+
+
+
+
+function reset() {
+
+    window.location.reload(false);
 }

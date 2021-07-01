@@ -55,14 +55,17 @@ tick.velocity = function (entity, delta) {
         makeCrossBoom(entity.crosshair);
         entity.crosshair.trail = entity.trail;
         collectGarbage = true;
-        particles.missileContainer[entity.blue].removeChild(entity.sprite);
+        (entity.type == "solair" ?
+            particles.missileContainer :
+            particles.tubeContainer
+            )[entity.blue].removeChild(entity.sprite);
     }
     entity.target.distance = currentDistance;
 
     entity.trail.scale.y = new Vector(entity.position.x, entity.position.y).distance(spritePos) / 2;
 
-    entity.sprite.x -= entity.target.move.x * delta;
-    entity.sprite.y -= entity.target.move.y * delta;
+    entity.sprite.x -= entity.target.move.x * bgScale;
+    entity.sprite.y -= entity.target.move.y * bgScale;
 }
 
 
@@ -82,8 +85,8 @@ tick.lineboom = function (entity, delta) {
         bg.y += v.y;
     }
 
-    entity.sprite.scale.x = globalScale * Math.sqrt(entity.size * 5);
-    entity.sprite.scale.y = globalScale * Math.sqrt(entity.size * 5);
+    entity.sprite.scale.x = missileScale * Math.sqrt(entity.size * 5);
+    entity.sprite.scale.y = missileScale * Math.sqrt(entity.size * 5);
 
 
     if (Math.random() > 0.5) {
@@ -91,13 +94,14 @@ tick.lineboom = function (entity, delta) {
         entity.lineboom.x = entity.sprite.x + (Math.random() - 0.5) * entity.size * 10;
         entity.lineboom.y = entity.sprite.y + (Math.random() - 0.5) * entity.size * 10;
 
-        entity.lineboom.scale.x = globalScale * Math.sqrt(entity.size * 5) + (3 * Math.random() - 1) * 0.04;
-        entity.lineboom.scale.y = globalScale * Math.sqrt(entity.size * 5) + (3 * Math.random() - 1) * 0.04;
+        entity.lineboom.scale.x = missileScale * Math.sqrt(entity.size * 5) + (3 * Math.random() - 1) * 0.04;
+        entity.lineboom.scale.y = missileScale * Math.sqrt(entity.size * 5) + (3 * Math.random() - 1) * 0.04;
 
         entity.lineboom.rotation = Math.random() * Math.PI * 2;
     }
 
     entity.trail.alpha -= delta * 0.03;
+    entity.trail.scale.y = new Vector(entity.lineboom.x, entity.lineboom.y).distance(entity.trail) / 2 - entity.sprite.scale.x * 100;
 
     if (entity.size <= 0) {
         entity.garbage = true;

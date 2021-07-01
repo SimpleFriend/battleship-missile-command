@@ -16,7 +16,8 @@ function placeFleet() {
 
         app.ticker.update();
 
-        confirmed = window.confirm("Confirm fleet");
+        //confirmed = window.confirm("Confirm fleet");
+        confirmed = true;
     }
 }
 
@@ -27,7 +28,7 @@ function placeFleet() {
 function placeShips() {
 
     let needPlacement = true;
-    let pos = {};
+    my.fleetPos = {};
     let grid;
 
     while (needPlacement) {
@@ -37,173 +38,181 @@ function placeShips() {
 
 
         let d = rnd(4);
-        pos.carrier = (d == 0 || d == 2) ? { // horizontal
+        my.fleetPos.carrier = (d == 0 || d == 2) ? { // horizontal
             x: rnd(3) + 1,
             y: rnd(17) + 0,
             d: d,
+            hp: 6
         } : { // vertical
             x: rnd(5) + 0,
             y: rnd(15) + 1,
             d: d,
+            hp: 6
         };
 
-        if (pos.carrier.d == 0) pos.carrier.parts = [
-            { x: pos.carrier.x - 1, y: pos.carrier.y + 0 },
-            { x: pos.carrier.x + 0, y: pos.carrier.y + 0 },
-            { x: pos.carrier.x + 1, y: pos.carrier.y + 0 },
-            { x: pos.carrier.x + 0, y: pos.carrier.y + 1 },
-            { x: pos.carrier.x + 1, y: pos.carrier.y + 1 },
-            { x: pos.carrier.x + 2, y: pos.carrier.y + 1 },
+        if (my.fleetPos.carrier.d == 0) my.fleetPos.carrier.parts = [
+            { x: my.fleetPos.carrier.x - 1, y: my.fleetPos.carrier.y + 0 },
+            { x: my.fleetPos.carrier.x + 0, y: my.fleetPos.carrier.y + 0 },
+            { x: my.fleetPos.carrier.x + 1, y: my.fleetPos.carrier.y + 0 },
+            { x: my.fleetPos.carrier.x + 0, y: my.fleetPos.carrier.y + 1 },
+            { x: my.fleetPos.carrier.x + 1, y: my.fleetPos.carrier.y + 1 },
+            { x: my.fleetPos.carrier.x + 2, y: my.fleetPos.carrier.y + 1 },
         ];
 
-        if (pos.carrier.d == 1) pos.carrier.parts = [
-            { x: pos.carrier.x + 0, y: pos.carrier.y + 0 },
-            { x: pos.carrier.x + 0, y: pos.carrier.y + 1 },
-            { x: pos.carrier.x + 0, y: pos.carrier.y + 2 },
-            { x: pos.carrier.x + 1, y: pos.carrier.y - 1 },
-            { x: pos.carrier.x + 1, y: pos.carrier.y + 0 },
-            { x: pos.carrier.x + 1, y: pos.carrier.y + 1 },
+        if (my.fleetPos.carrier.d == 1) my.fleetPos.carrier.parts = [
+            { x: my.fleetPos.carrier.x + 0, y: my.fleetPos.carrier.y + 0 },
+            { x: my.fleetPos.carrier.x + 0, y: my.fleetPos.carrier.y + 1 },
+            { x: my.fleetPos.carrier.x + 0, y: my.fleetPos.carrier.y + 2 },
+            { x: my.fleetPos.carrier.x + 1, y: my.fleetPos.carrier.y - 1 },
+            { x: my.fleetPos.carrier.x + 1, y: my.fleetPos.carrier.y + 0 },
+            { x: my.fleetPos.carrier.x + 1, y: my.fleetPos.carrier.y + 1 },
         ];
 
-        if (pos.carrier.d == 2) pos.carrier.parts = [
-            { x: pos.carrier.x - 1, y: pos.carrier.y + 1 },
-            { x: pos.carrier.x + 0, y: pos.carrier.y + 1 },
-            { x: pos.carrier.x + 1, y: pos.carrier.y + 1 },
-            { x: pos.carrier.x + 0, y: pos.carrier.y + 0 },
-            { x: pos.carrier.x + 1, y: pos.carrier.y + 0 },
-            { x: pos.carrier.x + 2, y: pos.carrier.y + 0 },
+        if (my.fleetPos.carrier.d == 2) my.fleetPos.carrier.parts = [
+            { x: my.fleetPos.carrier.x - 1, y: my.fleetPos.carrier.y + 1 },
+            { x: my.fleetPos.carrier.x + 0, y: my.fleetPos.carrier.y + 1 },
+            { x: my.fleetPos.carrier.x + 1, y: my.fleetPos.carrier.y + 1 },
+            { x: my.fleetPos.carrier.x + 0, y: my.fleetPos.carrier.y + 0 },
+            { x: my.fleetPos.carrier.x + 1, y: my.fleetPos.carrier.y + 0 },
+            { x: my.fleetPos.carrier.x + 2, y: my.fleetPos.carrier.y + 0 },
         ];
 
-        if (pos.carrier.d == 3) pos.carrier.parts = [
-            { x: pos.carrier.x + 1, y: pos.carrier.y + 0 },
-            { x: pos.carrier.x + 1, y: pos.carrier.y + 1 },
-            { x: pos.carrier.x + 1, y: pos.carrier.y + 2 },
-            { x: pos.carrier.x + 0, y: pos.carrier.y - 1 },
-            { x: pos.carrier.x + 0, y: pos.carrier.y + 0 },
-            { x: pos.carrier.x + 0, y: pos.carrier.y + 1 },
+        if (my.fleetPos.carrier.d == 3) my.fleetPos.carrier.parts = [
+            { x: my.fleetPos.carrier.x + 1, y: my.fleetPos.carrier.y + 0 },
+            { x: my.fleetPos.carrier.x + 1, y: my.fleetPos.carrier.y + 1 },
+            { x: my.fleetPos.carrier.x + 1, y: my.fleetPos.carrier.y + 2 },
+            { x: my.fleetPos.carrier.x + 0, y: my.fleetPos.carrier.y - 1 },
+            { x: my.fleetPos.carrier.x + 0, y: my.fleetPos.carrier.y + 0 },
+            { x: my.fleetPos.carrier.x + 0, y: my.fleetPos.carrier.y + 1 },
         ];
 
 
 
         d = rnd(4);
-        pos.submarine = (d == 0 || d == 2) ? { // horizontal
+        my.fleetPos.submarine = (d == 0 || d == 2) ? { // horizontal
             x: rnd(4) + 1,
             y: rnd(17) + (d == 0 ? 0 : 1),
             d: d,
+            hp: 4
         } : { // vertical
             x: rnd(5) + (d == 1 ? 1 : 0),
             y: rnd(16) + 1,
             d: d,
+            hp: 4
         };
 
-        if (pos.submarine.d == 0) pos.submarine.parts = [
-            { x: pos.submarine.x - 1, y: pos.submarine.y + 0 },
-            { x: pos.submarine.x + 0, y: pos.submarine.y + 0 },
-            { x: pos.submarine.x + 1, y: pos.submarine.y + 0 },
-            { x: pos.submarine.x + 0, y: pos.submarine.y + 1 },
+        if (my.fleetPos.submarine.d == 0) my.fleetPos.submarine.parts = [
+            { x: my.fleetPos.submarine.x - 1, y: my.fleetPos.submarine.y + 0 },
+            { x: my.fleetPos.submarine.x + 0, y: my.fleetPos.submarine.y + 0 },
+            { x: my.fleetPos.submarine.x + 1, y: my.fleetPos.submarine.y + 0 },
+            { x: my.fleetPos.submarine.x + 0, y: my.fleetPos.submarine.y + 1 },
         ];
 
-        if (pos.submarine.d == 1) pos.submarine.parts = [
-            { x: pos.submarine.x - 1, y: pos.submarine.y + 0 },
-            { x: pos.submarine.x + 0, y: pos.submarine.y - 1 },
-            { x: pos.submarine.x + 0, y: pos.submarine.y + 0 },
-            { x: pos.submarine.x + 0, y: pos.submarine.y + 1 },
+        if (my.fleetPos.submarine.d == 1) my.fleetPos.submarine.parts = [
+            { x: my.fleetPos.submarine.x - 1, y: my.fleetPos.submarine.y + 0 },
+            { x: my.fleetPos.submarine.x + 0, y: my.fleetPos.submarine.y - 1 },
+            { x: my.fleetPos.submarine.x + 0, y: my.fleetPos.submarine.y + 0 },
+            { x: my.fleetPos.submarine.x + 0, y: my.fleetPos.submarine.y + 1 },
         ];
 
-        if (pos.submarine.d == 2) pos.submarine.parts = [
-            { x: pos.submarine.x - 1, y: pos.submarine.y + 0 },
-            { x: pos.submarine.x + 0, y: pos.submarine.y + 0 },
-            { x: pos.submarine.x + 1, y: pos.submarine.y + 0 },
-            { x: pos.submarine.x + 0, y: pos.submarine.y - 1 },
+        if (my.fleetPos.submarine.d == 2) my.fleetPos.submarine.parts = [
+            { x: my.fleetPos.submarine.x - 1, y: my.fleetPos.submarine.y + 0 },
+            { x: my.fleetPos.submarine.x + 0, y: my.fleetPos.submarine.y + 0 },
+            { x: my.fleetPos.submarine.x + 1, y: my.fleetPos.submarine.y + 0 },
+            { x: my.fleetPos.submarine.x + 0, y: my.fleetPos.submarine.y - 1 },
         ];
 
-        if (pos.submarine.d == 3) pos.submarine.parts = [
-            { x: pos.submarine.x + 1, y: pos.submarine.y + 0 },
-            { x: pos.submarine.x + 0, y: pos.submarine.y - 1 },
-            { x: pos.submarine.x + 0, y: pos.submarine.y + 0 },
-            { x: pos.submarine.x + 0, y: pos.submarine.y + 1 },
+        if (my.fleetPos.submarine.d == 3) my.fleetPos.submarine.parts = [
+            { x: my.fleetPos.submarine.x + 1, y: my.fleetPos.submarine.y + 0 },
+            { x: my.fleetPos.submarine.x + 0, y: my.fleetPos.submarine.y - 1 },
+            { x: my.fleetPos.submarine.x + 0, y: my.fleetPos.submarine.y + 0 },
+            { x: my.fleetPos.submarine.x + 0, y: my.fleetPos.submarine.y + 1 },
         ];
 
 
 
         d = rnd(4);
-        pos.destroyer = (d == 0 || d == 2) ? { // horizontal
+        my.fleetPos.destroyer = (d == 0 || d == 2) ? { // horizontal
             x: rnd(4) + 1,
             y: rnd(18),
             d: d,
+            hp: 3
         } : { // vertical
             x: rnd(6),
             y: rnd(16) + 1,
             d: d,
+            hp: 3
         };
 
-        if (pos.destroyer.d == 0) pos.destroyer.parts = [
-            { x: pos.destroyer.x - 1, y: pos.destroyer.y + 0 },
-            { x: pos.destroyer.x + 0, y: pos.destroyer.y + 0 },
-            { x: pos.destroyer.x + 1, y: pos.destroyer.y + 0 },
+        if (my.fleetPos.destroyer.d == 0) my.fleetPos.destroyer.parts = [
+            { x: my.fleetPos.destroyer.x - 1, y: my.fleetPos.destroyer.y + 0 },
+            { x: my.fleetPos.destroyer.x + 0, y: my.fleetPos.destroyer.y + 0 },
+            { x: my.fleetPos.destroyer.x + 1, y: my.fleetPos.destroyer.y + 0 },
         ];
 
-        if (pos.destroyer.d == 1) pos.destroyer.parts = [
-            { x: pos.destroyer.x + 0, y: pos.destroyer.y - 1 },
-            { x: pos.destroyer.x + 0, y: pos.destroyer.y + 0 },
-            { x: pos.destroyer.x + 0, y: pos.destroyer.y + 1 },
+        if (my.fleetPos.destroyer.d == 1) my.fleetPos.destroyer.parts = [
+            { x: my.fleetPos.destroyer.x + 0, y: my.fleetPos.destroyer.y - 1 },
+            { x: my.fleetPos.destroyer.x + 0, y: my.fleetPos.destroyer.y + 0 },
+            { x: my.fleetPos.destroyer.x + 0, y: my.fleetPos.destroyer.y + 1 },
         ];
 
-        if (pos.destroyer.d == 2) pos.destroyer.parts = [
-            { x: pos.destroyer.x - 1, y: pos.destroyer.y + 0 },
-            { x: pos.destroyer.x + 0, y: pos.destroyer.y + 0 },
-            { x: pos.destroyer.x + 1, y: pos.destroyer.y + 0 },
+        if (my.fleetPos.destroyer.d == 2) my.fleetPos.destroyer.parts = [
+            { x: my.fleetPos.destroyer.x - 1, y: my.fleetPos.destroyer.y + 0 },
+            { x: my.fleetPos.destroyer.x + 0, y: my.fleetPos.destroyer.y + 0 },
+            { x: my.fleetPos.destroyer.x + 1, y: my.fleetPos.destroyer.y + 0 },
         ];
 
-        if (pos.destroyer.d == 3) pos.destroyer.parts = [
-            { x: pos.destroyer.x + 0, y: pos.destroyer.y - 1 },
-            { x: pos.destroyer.x + 0, y: pos.destroyer.y + 0 },
-            { x: pos.destroyer.x + 0, y: pos.destroyer.y + 1 },
+        if (my.fleetPos.destroyer.d == 3) my.fleetPos.destroyer.parts = [
+            { x: my.fleetPos.destroyer.x + 0, y: my.fleetPos.destroyer.y - 1 },
+            { x: my.fleetPos.destroyer.x + 0, y: my.fleetPos.destroyer.y + 0 },
+            { x: my.fleetPos.destroyer.x + 0, y: my.fleetPos.destroyer.y + 1 },
         ];
 
 
 
         d = rnd(4);
-        pos.battleship = (d == 0 || d == 2) ? { // horizontal
+        my.fleetPos.battleship = (d == 0 || d == 2) ? { // horizontal
             x: rnd(2) + 2,
             y: rnd(18),
             d: d,
+            hp: 5
         } : { // vertical
             x: rnd(6),
             y: rnd(14) + 2,
             d: d,
+            hp: 5
         };
 
-        if (pos.battleship.d == 0) pos.battleship.parts = [
-            { x: pos.battleship.x - 2, y: pos.battleship.y + 0 },
-            { x: pos.battleship.x - 1, y: pos.battleship.y + 0 },
-            { x: pos.battleship.x + 0, y: pos.battleship.y + 0 },
-            { x: pos.battleship.x + 1, y: pos.battleship.y + 0 },
-            { x: pos.battleship.x + 2, y: pos.battleship.y + 0 },
+        if (my.fleetPos.battleship.d == 0) my.fleetPos.battleship.parts = [
+            { x: my.fleetPos.battleship.x - 2, y: my.fleetPos.battleship.y + 0 },
+            { x: my.fleetPos.battleship.x - 1, y: my.fleetPos.battleship.y + 0 },
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y + 0 },
+            { x: my.fleetPos.battleship.x + 1, y: my.fleetPos.battleship.y + 0 },
+            { x: my.fleetPos.battleship.x + 2, y: my.fleetPos.battleship.y + 0 },
         ];
 
-        if (pos.battleship.d == 1) pos.battleship.parts = [
-            { x: pos.battleship.x + 0, y: pos.battleship.y - 2 },
-            { x: pos.battleship.x + 0, y: pos.battleship.y - 1 },
-            { x: pos.battleship.x + 0, y: pos.battleship.y + 0 },
-            { x: pos.battleship.x + 0, y: pos.battleship.y + 1 },
-            { x: pos.battleship.x + 0, y: pos.battleship.y + 2 },
+        if (my.fleetPos.battleship.d == 1) my.fleetPos.battleship.parts = [
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y - 2 },
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y - 1 },
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y + 0 },
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y + 1 },
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y + 2 },
         ];
 
-        if (pos.battleship.d == 2) pos.battleship.parts = [
-            { x: pos.battleship.x - 2, y: pos.battleship.y + 0 },
-            { x: pos.battleship.x - 1, y: pos.battleship.y + 0 },
-            { x: pos.battleship.x + 0, y: pos.battleship.y + 0 },
-            { x: pos.battleship.x + 1, y: pos.battleship.y + 0 },
-            { x: pos.battleship.x + 2, y: pos.battleship.y + 0 },
+        if (my.fleetPos.battleship.d == 2) my.fleetPos.battleship.parts = [
+            { x: my.fleetPos.battleship.x - 2, y: my.fleetPos.battleship.y + 0 },
+            { x: my.fleetPos.battleship.x - 1, y: my.fleetPos.battleship.y + 0 },
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y + 0 },
+            { x: my.fleetPos.battleship.x + 1, y: my.fleetPos.battleship.y + 0 },
+            { x: my.fleetPos.battleship.x + 2, y: my.fleetPos.battleship.y + 0 },
         ];
 
-        if (pos.battleship.d == 3) pos.battleship.parts = [
-            { x: pos.battleship.x + 0, y: pos.battleship.y - 2 },
-            { x: pos.battleship.x + 0, y: pos.battleship.y - 1 },
-            { x: pos.battleship.x + 0, y: pos.battleship.y + 0 },
-            { x: pos.battleship.x + 0, y: pos.battleship.y + 1 },
-            { x: pos.battleship.x + 0, y: pos.battleship.y + 2 },
+        if (my.fleetPos.battleship.d == 3) my.fleetPos.battleship.parts = [
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y - 2 },
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y - 1 },
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y + 0 },
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y + 1 },
+            { x: my.fleetPos.battleship.x + 0, y: my.fleetPos.battleship.y + 2 },
         ];
 
 
@@ -211,12 +220,12 @@ function placeShips() {
 
         needPlacement = false;
 
-        for (let ipos1 in pos) for (let ipart1 of pos[ipos1].parts)
-            for (let ipos2 in pos) for (let ipart2 of pos[ipos2].parts)
+        for (let ipos1 in my.fleetPos) for (let ipart1 of my.fleetPos[ipos1].parts)
+            for (let ipos2 in my.fleetPos) for (let ipart2 of my.fleetPos[ipos2].parts)
                 if (ipos1 != ipos2)
                     if ((Math.abs(ipart1.x - ipart2.x) + Math.abs(ipart1.y - ipart2.y)) < 2)
                         needPlacement = true;
     }
 
-    return pos;
+    return my.fleetPos;
 }
